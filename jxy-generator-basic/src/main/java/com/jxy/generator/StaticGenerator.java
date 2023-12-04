@@ -41,7 +41,7 @@ public class StaticGenerator {
     private static void copyFileBtRecursive(File inputFile, File outputFile) throws IOException {
         // 判断是文件还是目录
         if (inputFile.isDirectory()) {
-            System.out.println(inputFile.getName());
+//            System.out.println(inputFile.getName());
             // 是目录，目标路径需要创建出新目录
             File destOutputFile = new File(outputFile, inputFile.getName());
             if (!destOutputFile.exists()) {
