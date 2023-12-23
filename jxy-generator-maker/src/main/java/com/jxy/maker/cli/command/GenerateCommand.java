@@ -1,8 +1,8 @@
-package com.jxy.cli.command;
+package com.jxy.maker.cli.command;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.jxy.generator.MainGenerator;
-import com.jxy.model.MainTemplateConfig;
+import com.jxy.maker.generator.file.MainFileGenerator;
+import com.jxy.maker.model.DataModel;
 import lombok.Data;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Command;
@@ -17,10 +17,10 @@ import java.util.concurrent.Callable;
 @Data
 public class GenerateCommand implements Callable<Integer> {
 
-    @Option(names = {"-l", "--loop"}, arity = "0..1", echo = true, description = "是否循环", interactive = true)
+    @Option(names = {"-l", "--loop"}, arity = "0..1", echo = true, description = "是否循环", interactive = true, paramLabel = "<locale>")
     private boolean loop;
 
-    @Option(names = {"-a", "--author"}, arity = "0..1", echo = true, description = "作者", interactive = true)
+    @Option(names = {"-DataModel.java.ftl", "--author"}, arity = "0..1", echo = true, description = "作者", interactive = true)
     private String author;
 
     @Option(names = {"-o", "--outputText"}, arity = "0..1", echo = true, description = "输出文本", interactive = true)
@@ -29,10 +29,10 @@ public class GenerateCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         // 模板数据
-        MainTemplateConfig model = new MainTemplateConfig();
+        DataModel model = new DataModel();
         BeanUtil.copyProperties(this, model);
         // 调用实现好的 静态 + 动态 代码生成器
-        MainGenerator.doGenerator(model);
+        MainFileGenerator.doGenerator(model);
         return 0;
     }
 }

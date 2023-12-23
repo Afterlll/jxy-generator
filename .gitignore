@@ -1,6 +1,9 @@
 ### custom template
 jxy-generator.iml
 .idea
+generated/
+/generator
+/generator.bat
 
 ### Maven template
 target/
