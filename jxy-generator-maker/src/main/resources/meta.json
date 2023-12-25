@@ -6,8 +6,10 @@
   "author": "jxy",
   "createTime": "2023-12-4",
   "fileConfig": {
-    "inputRootPath": "D:/code/project/generator/jxy-generator/jxy-generator-demo/acm-template-pro",
+    "inputRootPath": ".source/acm-template-pro",
     "outputRootPath": "generated",
+    "sourceRootPath": "D:/code/project/jxy-generator/jxy-generator-demo/acm-template-pro",
+    "gitRootPath": "D:/code/project/jxy-generator/.gitignore",
     "type": "dir",
     "files":[
       {
