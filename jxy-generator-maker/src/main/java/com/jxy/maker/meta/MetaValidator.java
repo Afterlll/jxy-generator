@@ -10,6 +10,7 @@ import com.jxy.maker.meta.enums.ModelTypeEnum;
 
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 元信息校验类
@@ -34,6 +35,15 @@ public class MetaValidator {
             return;
         }
         for (Meta.ModelConfig.ModelInfo model : models) {
+            // 为 group 时 不校验
+            if (StrUtil.isNotEmpty(model.getGroupKey())) {
+                // 生成中间参数
+                String allArgsStr = model.getModels().stream()
+                        .map(subModelInfo -> String.format("\"--%s\"", subModelInfo.getFieldName()))
+                        .collect(Collectors.joining(", "));
+                model.setAllArgsStr(allArgsStr);
+                continue;
+            }
             String fieldName = model.getFieldName();
             if (StrUtil.isBlank(fieldName)) {
                 throw new MetaException("未填写 fieldName");
@@ -72,6 +82,10 @@ public class MetaValidator {
             return;
         }
         for (Meta.FileConfig.FileInfo file : files) {
+            // 类型为 group 不需要校验
+            if (FileTypeEnum.GROUP.getValue().equals(file.getType())) {
+                continue;
+            }
             // inputPath 必填
             String inputPath = file.getInputPath();
             if (StrUtil.isBlank(inputPath)) {

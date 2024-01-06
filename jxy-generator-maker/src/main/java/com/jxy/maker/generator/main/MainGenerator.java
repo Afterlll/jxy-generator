@@ -5,6 +5,4 @@ package com.jxy.maker.generator.main;
  */
 public class MainGenerator extends GenerateTemplate {
 
-
-
 }

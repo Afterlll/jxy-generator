@@ -9,48 +9,61 @@ import java.util.List;
 @Data
 public class Meta {
 
-    private String name;
-    private String description;
-    private String basePackage;
-    private String version;
-    private String author;
-    private String createTime;
-    private FileConfig fileConfig;
-    private ModelConfig modelConfig;
+    public String name;
+    public String description;
+    public String basePackage;
+    public String version;
+    public String author;
+    public String createTime;
+    public FileConfig fileConfig;
+    public ModelConfig modelConfig;
 
     @NoArgsConstructor
     @Data
     public static class FileConfig {
-        private String inputRootPath;
-        private String outputRootPath;
-        private String sourceRootPath;
-        private String gitRootPath;
-        private String type;
-        private List<FileInfo> files;
+        public String inputRootPath;
+        public String outputRootPath;
+        public String sourceRootPath;
+        public String gitRootPath;
+        public String type;
+        public List<FileInfo> files;
 
         @NoArgsConstructor
         @Data
         public static class FileInfo {
-            private String inputPath;
-            private String outputPath;
-            private String type;
-            private String generateType;
+            public String inputPath;
+            public String outputPath;
+            public String type;
+            public String generateType;
+            public String condition;
+            public String groupKey;
+            public String groupName;
+            public List<FileInfo> files;
         }
     }
 
     @NoArgsConstructor
     @Data
     public static class ModelConfig {
-        private List<ModelInfo> models;
+        public List<ModelInfo> models;
 
         @NoArgsConstructor
         @Data
         public static class ModelInfo {
-            private String fieldName;
-            private String type;
-            private String description;
-            private Object defaultValue;
-            private String abbr;
+            public String fieldName;
+            public String type;
+            public String description;
+            public Object defaultValue;
+            public String abbr;
+            public String groupKey;
+            public String groupName;
+            public List<ModelInfo> models;
+            public String condition;
+
+            // 中间参数
+            // 该分组下所有参数拼接字符串
+            public String allArgsStr;
         }
     }
+
 }

@@ -16,7 +16,6 @@ public class MainFileGenerator {
      * @throws IOException
      */
     public static void doGenerator(Object model) throws TemplateException, IOException {
-        // ---------------- 以下是以 D:\code\project\generator\jxy-generator\jxy-generator-basic 为根路径的方式
         // 项目根路径
         String projectPath = System.getProperty("user.dir");
         String parentPath = new File(projectPath).getParent();
