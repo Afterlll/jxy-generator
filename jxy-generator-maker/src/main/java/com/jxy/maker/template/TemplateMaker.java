@@ -65,7 +65,7 @@ public class TemplateMaker {
         // 是否为首次制作模板
         // 文件不存在，就是首次制作
         if (!FileUtil.exist(templatePath)) {
-            FileUtil.mkdir(tempDirPath);
+            FileUtil.mkdir(templatePath);
             FileUtil.copy(originProjectPath, templatePath, true);
         }
 
@@ -95,14 +95,14 @@ public class TemplateMaker {
             newMeta = oldMeta;
 
             // 1. 追加配置参数
-            List<Meta.FileConfig.FileInfo> fileInfoList = oldMeta.getFileConfig().getFiles();
+            List<Meta.FileConfig.FileInfo> fileInfoList = newMeta.getFileConfig().getFiles();
             fileInfoList.addAll(newFileInfoList);
-            List<Meta.ModelConfig.ModelInfo> modelInfoList = oldMeta.getModelConfig().getModels();
+            List<Meta.ModelConfig.ModelInfo> modelInfoList = newMeta.getModelConfig().getModels();
             modelInfoList.addAll(newModelInfoList);
 
             // 2. 模型去重
-            oldMeta.getFileConfig().setFiles(distinctFiles(fileInfoList));
-            oldMeta.getModelConfig().setModels(distinctModels(modelInfoList));
+            newMeta.getFileConfig().setFiles(distinctFiles(fileInfoList));
+            newMeta.getModelConfig().setModels(distinctModels(modelInfoList));
         } else {
             // 1. 构造配置参数
             Meta.FileConfig fileConfig = new Meta.FileConfig();
@@ -116,7 +116,7 @@ public class TemplateMaker {
             newMeta.setModelConfig(modelConfig);
             List<Meta.ModelConfig.ModelInfo> modelInfoList = new ArrayList<>();
             modelConfig.setModels(modelInfoList);
-            modelInfoList.addAll(modelInfoList);
+            modelInfoList.addAll(newModelInfoList);
         }
 
         // 2. 额外的输出配置
@@ -244,11 +244,10 @@ public class TemplateMaker {
         String fileInputPath = fileInputAbsolutePath.replace(sourceRootPath + "/", "");
         String fileOutputPath = fileInputPath + ".ftl";
 
-        // 是否已经存在模板文件
-        boolean hasTemplateFile = FileUtil.exist(fileOutputAbsolutePath);
         // 使用字符串替换，生成模板文件
         String fileContent;
         // 如果已有模板文件，说明不是第一次制作，则在模板基础上再次挖坑
+        boolean hasTemplateFile = FileUtil.exist(fileOutputAbsolutePath);
         if (hasTemplateFile) {
             fileContent = FileUtil.readUtf8String(fileOutputAbsolutePath);
         } else {
