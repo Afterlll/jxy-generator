@@ -10,29 +10,219 @@ import cn.hutool.json.JSONUtil;
 import com.jxy.maker.meta.Meta;
 import com.jxy.maker.meta.enums.FileGenerateTypeEnum;
 import com.jxy.maker.meta.enums.FileTypeEnum;
+import com.jxy.maker.template.enums.FileFilterRangeEnum;
+import com.jxy.maker.template.enums.FileFilterRuleEnum;
+import com.jxy.maker.template.model.FileFilterConfig;
 import com.jxy.maker.template.model.TemplateMakerFileConfig;
 import com.jxy.maker.template.model.TemplateMakerModelConfig;
+import org.junit.Test;
 
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * 模板制作工具
- */
-public class TemplateMaker {
+import static org.junit.Assert.*;
+
+public class TemplateMakerTest {
+
+    @Test
+    public static void testTemplateMaker() {
+        // 输入项目基本信息
+        Meta meta = new Meta();
+        meta.setName("SpringBoot-Init");
+        meta.setDescription("SpringBoot Init 项目");
+
+        // 指定原始项目路径
+        String projectPath = System.getProperty("user.dir");
+        String originProjectPath = new File(projectPath).getParent() + File.separator + "jxy-generator-demo/springboot-init";
+
+        String fileInputPath1 = "src/main/java/com/yupi/springbootinit/common";
+        String fileInputPath2 = "src/main/resources/application.yml";
+
+        // 模型参数配置
+        TemplateMakerModelConfig templateMakerModelConfig = new TemplateMakerModelConfig();
+
+        // - 模型组配置
+        TemplateMakerModelConfig.ModelGroupConfig modelGroupConfig = new TemplateMakerModelConfig.ModelGroupConfig();
+        modelGroupConfig.setGroupKey("mysql");
+        modelGroupConfig.setGroupName("数据库配置");
+        templateMakerModelConfig.setModelGroupConfig(modelGroupConfig);
+
+        // - 模型配置
+        TemplateMakerModelConfig.ModelInfoConfig modelInfoConfig1 = new TemplateMakerModelConfig.ModelInfoConfig();
+        modelInfoConfig1.setFieldName("url");
+        modelInfoConfig1.setType("String");
+        modelInfoConfig1.setDefaultValue("jdbc:mysql://localhost:3306/my_db");
+        modelInfoConfig1.setReplaceText("jdbc:mysql://localhost:3306/my_db");
+
+        TemplateMakerModelConfig.ModelInfoConfig modelInfoConfig2 = new TemplateMakerModelConfig.ModelInfoConfig();
+        modelInfoConfig2.setFieldName("username");
+        modelInfoConfig2.setType("String");
+        modelInfoConfig2.setDefaultValue("root");
+        modelInfoConfig2.setReplaceText("root");
+
+        List<TemplateMakerModelConfig.ModelInfoConfig> modelInfoConfigList = Arrays.asList(modelInfoConfig1, modelInfoConfig2);
+        templateMakerModelConfig.setModels(modelInfoConfigList);
+
+        Meta.ModelConfig.ModelInfo modelInfo = new Meta.ModelConfig.ModelInfo();
+        modelInfo.setFieldName("className");
+        modelInfo.setType("String");
+
+        String searchStr = "BaseResponse";
+
+        // 文件过滤
+        TemplateMakerFileConfig templateMakerFileConfig = new TemplateMakerFileConfig();
+        TemplateMakerFileConfig.FileInfoConfig fileInfoConfig1 = new TemplateMakerFileConfig.FileInfoConfig();
+        fileInfoConfig1.setPath(fileInputPath1);
+        List<FileFilterConfig> filterConfigList = new ArrayList<>();
+        FileFilterConfig fileFilterConfig = FileFilterConfig.builder()
+                .range(FileFilterRangeEnum.FILE_NAME.getValue())
+                .rule(FileFilterRuleEnum.CONTAINS.getValue())
+                .value("Base")
+                .build();
+        filterConfigList.add(fileFilterConfig);
+        fileInfoConfig1.setFilterConfigList(filterConfigList);
+
+        TemplateMakerFileConfig.FileInfoConfig fileInfoConfig2 = new TemplateMakerFileConfig.FileInfoConfig();
+        fileInfoConfig2.setPath(fileInputPath2);
+        templateMakerFileConfig.setFiles(Arrays.asList(fileInfoConfig1, fileInfoConfig2));
+
+        // 分组配置
+        TemplateMakerFileConfig.FileGroupConfig fileGroupConfig = new TemplateMakerFileConfig.FileGroupConfig();
+        fileGroupConfig.setCondition("openMySql");
+        fileGroupConfig.setGroupKey("MySql");
+        fileGroupConfig.setGroupName("MySql分组");
+        templateMakerFileConfig.setFileGroupConfig(fileGroupConfig);
+
+        makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, 1L);
+    }
 
     /**
-     * 制作模板
-     *
-     * @param newMeta
-     * @param originProjectPath
-     * @param templateMakerFileConfig
-     * @param templateMakerModelConfig
-     * @param id
-     * @return
+     * bug1 ： 同配置多次生成，强制变为静态生成
      */
+    @Test
+    public void testTemplateMakerBug1() {
+        Meta meta = new Meta();
+        meta.setName("SpringBoot-Init");
+        meta.setDescription("SpringBoot Init 项目");
+
+        String projectPath = System.getProperty("user.dir");
+        String originProjectPath = new File(projectPath).getParent() + File.separator + "jxy-generator-demo/springboot-init";
+
+        // 文件参数配置
+        String fileInputPath1 = "src/main/resources/application.yml";
+        TemplateMakerFileConfig templateMakerFileConfig = new TemplateMakerFileConfig();
+        TemplateMakerFileConfig.FileInfoConfig fileInfoConfig1 = new TemplateMakerFileConfig.FileInfoConfig();
+        fileInfoConfig1.setPath(fileInputPath1);
+        templateMakerFileConfig.setFiles(Arrays.asList(fileInfoConfig1));
+
+        // 模型参数配置
+        TemplateMakerModelConfig templateMakerModelConfig = new TemplateMakerModelConfig();
+        TemplateMakerModelConfig.ModelInfoConfig modelInfoConfig1 = new TemplateMakerModelConfig.ModelInfoConfig();
+        modelInfoConfig1.setFieldName("url");
+        modelInfoConfig1.setType("String");
+        modelInfoConfig1.setDefaultValue("jdbc:mysql://localhost:3306/my_db");
+        modelInfoConfig1.setReplaceText("jdbc:mysql://localhost:3306/my_db");
+        List<TemplateMakerModelConfig.ModelInfoConfig> modelInfoConfigList = Arrays.asList(modelInfoConfig1);
+        templateMakerModelConfig.setModels(modelInfoConfigList);
+
+        makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, 1L);
+    }
+
+    /**
+     * bug2：错误处理了新生成的模板文件
+     */
+    @Test
+    public void testTemplateMakerBug2() {
+        Meta meta = new Meta();
+        meta.setName("SpringBoot-Init");
+        meta.setDescription("SpringBoot Init 项目");
+
+        String projectPath = System.getProperty("user.dir");
+        String originProjectPath = new File(projectPath).getParent() + File.separator + "jxy-generator-demo/springboot-init";
+
+        // 文件参数配置
+        String fileInputPath1 = "src/main/java/com/yupi/springbootinit/common";
+        TemplateMakerFileConfig templateMakerFileConfig = new TemplateMakerFileConfig();
+        TemplateMakerFileConfig.FileInfoConfig fileInfoConfig1 = new TemplateMakerFileConfig.FileInfoConfig();
+        fileInfoConfig1.setPath(fileInputPath1);
+        templateMakerFileConfig.setFiles(Arrays.asList(fileInfoConfig1));
+
+        // 模型参数配置
+        TemplateMakerModelConfig templateMakerModelConfig = new TemplateMakerModelConfig();
+        TemplateMakerModelConfig.ModelInfoConfig modelInfoConfig1 = new TemplateMakerModelConfig.ModelInfoConfig();
+        modelInfoConfig1.setFieldName("className");
+        modelInfoConfig1.setType("String");
+        modelInfoConfig1.setReplaceText("BaseResponse");
+        List<TemplateMakerModelConfig.ModelInfoConfig> modelInfoConfigList = Arrays.asList(modelInfoConfig1);
+        templateMakerModelConfig.setModels(modelInfoConfigList);
+
+        makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, 2L);
+    }
+
+    /**
+     * bug3：模板制作工具生成的配置文件中 文件输入路径与输出路径相反
+     */
+    @Test
+    public void testTemplateMakerBug3() {
+        Meta meta = new Meta();
+        meta.setName("SpringBoot-Init");
+        meta.setDescription("SpringBoot Init 项目");
+
+        String projectPath = System.getProperty("user.dir");
+        String originProjectPath = new File(projectPath).getParent() + File.separator + "jxy-generator-demo/springboot-init";
+
+        // 文件参数配置
+        String fileInputPath1 = "src/main/java/com/yupi/springbootinit/common";
+        TemplateMakerFileConfig templateMakerFileConfig = new TemplateMakerFileConfig();
+        TemplateMakerFileConfig.FileInfoConfig fileInfoConfig1 = new TemplateMakerFileConfig.FileInfoConfig();
+        fileInfoConfig1.setPath(fileInputPath1);
+        templateMakerFileConfig.setFiles(Arrays.asList(fileInfoConfig1));
+
+        // 模型参数配置
+        TemplateMakerModelConfig templateMakerModelConfig = new TemplateMakerModelConfig();
+        TemplateMakerModelConfig.ModelInfoConfig modelInfoConfig1 = new TemplateMakerModelConfig.ModelInfoConfig();
+        modelInfoConfig1.setFieldName("className");
+        modelInfoConfig1.setType("String");
+        modelInfoConfig1.setReplaceText("BaseResponse");
+        List<TemplateMakerModelConfig.ModelInfoConfig> modelInfoConfigList = Arrays.asList(modelInfoConfig1);
+        templateMakerModelConfig.setModels(modelInfoConfigList);
+
+        makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, 3L);
+    }
+
+    /**
+     * bug4：现在我们的 meta.json 文件会生成在工作空间内、项目的根目录下，如果我们指定的输入文件路径是项目的根目录，那么 meta.json 文件也会被当成项目文件被扫描处理。
+     */
+    @Test
+    public void testTemplateMakerBug4() {
+        Meta meta = new Meta();
+        meta.setName("SpringBoot-Init");
+        meta.setDescription("SpringBoot Init 项目");
+
+        String projectPath = System.getProperty("user.dir");
+        String originProjectPath = new File(projectPath).getParent() + File.separator + "jxy-generator-demo/springboot-init";
+
+        // 文件参数配置
+        String fileInputPath1 = "./";
+        TemplateMakerFileConfig templateMakerFileConfig = new TemplateMakerFileConfig();
+        TemplateMakerFileConfig.FileInfoConfig fileInfoConfig1 = new TemplateMakerFileConfig.FileInfoConfig();
+        fileInfoConfig1.setPath(fileInputPath1);
+        templateMakerFileConfig.setFiles(Arrays.asList(fileInfoConfig1));
+
+        // 模型参数配置
+        TemplateMakerModelConfig templateMakerModelConfig = new TemplateMakerModelConfig();
+        TemplateMakerModelConfig.ModelInfoConfig modelInfoConfig1 = new TemplateMakerModelConfig.ModelInfoConfig();
+        modelInfoConfig1.setFieldName("className");
+        modelInfoConfig1.setType("String");
+        modelInfoConfig1.setReplaceText("BaseResponse");
+        List<TemplateMakerModelConfig.ModelInfoConfig> modelInfoConfigList = Arrays.asList(modelInfoConfig1);
+        templateMakerModelConfig.setModels(modelInfoConfigList);
+
+        makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, 4L);
+    }
+
     private static long makeTemplate(Meta newMeta, String originProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, Long id) {
         // 没有 id 则生成
         if (id == null) {
@@ -169,14 +359,6 @@ public class TemplateMaker {
         return id;
     }
 
-    /**
-     * 制作文件模板
-     *
-     * @param templateMakerModelConfig
-     * @param sourceRootPath
-     * @param inputFile
-     * @return
-     */
     private static Meta.FileConfig.FileInfo makeFileTemplate(TemplateMakerModelConfig templateMakerModelConfig, String sourceRootPath, File inputFile) {
         // 要挖坑的文件绝对路径（用于制作模板）
         // 注意 win 系统需要对路径进行转义
@@ -245,18 +427,6 @@ public class TemplateMaker {
         return fileInfo;
     }
 
-    /**
-     * 文件去重
-     *
-     * 步骤：
-     *      1. 将所有的文件配置（fileInfo）分为有分组的和无分组的
-     *      2. 对于有分组的文件配置，如果有相同的分组，同分组内的文件进行合并（merge），不同分组可同时保留
-     *      3. 创建新的文件配置列表（结果列表），先将合并后的分组添加到结果列表
-     *      4. 再将无分组的文件按配置列表添加到结果列表
-     *
-     * @param fileInfoList
-     * @return
-     */
     private static List<Meta.FileConfig.FileInfo> distinctFiles(List<Meta.FileConfig.FileInfo> fileInfoList) {
         // 策略：同分组内文件 merge， 不同分组保留
 
@@ -303,12 +473,6 @@ public class TemplateMaker {
         return resultList;
     }
 
-    /**
-     * 模型去重
-     *
-     * @param modelInfoList
-     * @return
-     */
     private static List<Meta.ModelConfig.ModelInfo> distinctModels(List<Meta.ModelConfig.ModelInfo> modelInfoList) {
         // 策略：同分组内模型 merge，不同分组保留
 
@@ -351,6 +515,5 @@ public class TemplateMaker {
                 ).values()));
         return resultList;
     }
-
 
 }
