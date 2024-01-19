@@ -32,15 +32,4 @@ public class MainFileGenerator {
         DynamicFileGenerator.deGenerator(inputPath, outputPath, model);
     }
 
-    public static void main(String[] args) {
-        // 项目根路径
-        String projectPath = System.getProperty("user.dir");
-        String parentPath = new File(projectPath).getParent();
-        // 文件模板输入路径
-        String inputPath = parentPath + File.separator + "jxy-generator-demo" +  File.separator + "acm-template";
-        // 代码生成器生成代码位置
-        String outputPath = projectPath;
-        System.out.println(inputPath);
-        System.out.println(outputPath);
-    }
 }
