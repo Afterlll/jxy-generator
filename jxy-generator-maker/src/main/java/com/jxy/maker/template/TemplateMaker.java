@@ -10,6 +10,7 @@ import cn.hutool.json.JSONUtil;
 import com.jxy.maker.meta.Meta;
 import com.jxy.maker.meta.enums.FileGenerateTypeEnum;
 import com.jxy.maker.meta.enums.FileTypeEnum;
+import com.jxy.maker.template.model.TemplateMakerConfig;
 import com.jxy.maker.template.model.TemplateMakerFileConfig;
 import com.jxy.maker.template.model.TemplateMakerModelConfig;
 
@@ -26,6 +27,22 @@ public class TemplateMaker {
     /**
      * 制作模板
      *
+     * @param templateMakerConfig
+     * @return
+     */
+    public static long makeTemplate(TemplateMakerConfig templateMakerConfig) {
+        Long id = templateMakerConfig.getId();
+        Meta meta = templateMakerConfig.getMeta();
+        String originProjectPath = templateMakerConfig.getOriginProjectPath();
+        TemplateMakerFileConfig fileConfig = templateMakerConfig.getFileConfig();
+        TemplateMakerModelConfig modelConfig = templateMakerConfig.getModelConfig();
+
+        return makeTemplate(meta, originProjectPath, fileConfig, modelConfig, id);
+    }
+
+    /**
+     * 制作模板
+     *
      * @param newMeta
      * @param originProjectPath
      * @param templateMakerFileConfig
@@ -33,7 +50,7 @@ public class TemplateMaker {
      * @param id
      * @return
      */
-    private static long makeTemplate(Meta newMeta, String originProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, Long id) {
+    public static long makeTemplate(Meta newMeta, String originProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, Long id) {
         // 没有 id 则生成
         if (id == null) {
             id = IdUtil.getSnowflakeNextId();

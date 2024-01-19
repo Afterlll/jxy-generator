@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -13,6 +14,7 @@ import com.jxy.maker.meta.enums.FileTypeEnum;
 import com.jxy.maker.template.enums.FileFilterRangeEnum;
 import com.jxy.maker.template.enums.FileFilterRuleEnum;
 import com.jxy.maker.template.model.FileFilterConfig;
+import com.jxy.maker.template.model.TemplateMakerConfig;
 import com.jxy.maker.template.model.TemplateMakerFileConfig;
 import com.jxy.maker.template.model.TemplateMakerModelConfig;
 import org.junit.Test;
@@ -22,12 +24,21 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
-
 public class TemplateMakerTest {
 
+    /**
+     * 易用性优化
+     */
     @Test
-    public static void testTemplateMaker() {
+    public void testMakeTemplateWithJson() {
+        String configStr = ResourceUtil.readUtf8Str("example/springboot-init/templateMaker.json");
+        TemplateMakerConfig templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        long id = TemplateMaker.makeTemplate(templateMakerConfig);
+        System.out.println(id);
+    }
+
+    @Test
+    public void testTemplateMaker() {
         // 输入项目基本信息
         Meta meta = new Meta();
         meta.setName("SpringBoot-Init");
@@ -221,6 +232,16 @@ public class TemplateMakerTest {
         templateMakerModelConfig.setModels(modelInfoConfigList);
 
         makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, 4L);
+    }
+
+    private static long makeTemplate(TemplateMakerConfig templateMakerConfig) {
+        Long id = templateMakerConfig.getId();
+        Meta meta = templateMakerConfig.getMeta();
+        String originProjectPath = templateMakerConfig.getOriginProjectPath();
+        TemplateMakerFileConfig fileConfig = templateMakerConfig.getFileConfig();
+        TemplateMakerModelConfig modelConfig = templateMakerConfig.getModelConfig();
+
+        return makeTemplate(meta, originProjectPath, fileConfig, modelConfig, id);
     }
 
     private static long makeTemplate(Meta newMeta, String originProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, Long id) {
