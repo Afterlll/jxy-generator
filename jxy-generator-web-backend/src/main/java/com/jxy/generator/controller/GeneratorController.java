@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
- * 帖子接口
+ * 代码生成器接口
  *
  * @author 江喜原
  */

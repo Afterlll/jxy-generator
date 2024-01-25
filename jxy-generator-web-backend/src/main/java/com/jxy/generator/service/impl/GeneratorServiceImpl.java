@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 帖子服务实现
+ * 代码生成器服务实现
  *
  * @author 江喜原
  */
@@ -48,10 +48,10 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         }
         String name = generator.getName();
         String description = generator.getDescription();
-        String tags = generator.getTags();
+
         // 创建时，参数不能为空
         if (add) {
-            ThrowUtils.throwIf(StringUtils.isAnyBlank(name, description, tags), ErrorCode.PARAMS_ERROR);
+            ThrowUtils.throwIf(StringUtils.isAnyBlank(name, description), ErrorCode.PARAMS_ERROR);
         }
         // 有参数则校验
         if (StringUtils.isNotBlank(name) && name.length() > 80) {
@@ -74,7 +74,6 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         if (generatorQueryRequest == null) {
             return queryWrapper;
         }
-
         Long id = generatorQueryRequest.getId();
         Long notId = generatorQueryRequest.getNotId();
         String searchText = generatorQueryRequest.getSearchText();
@@ -92,7 +91,7 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
 
         // 拼接查询条件
         if (StringUtils.isNotBlank(searchText)) {
-            queryWrapper.and(qw -> qw.like("title", searchText).or().like("content", searchText));
+            queryWrapper.and(qw -> qw.like("name", searchText).or().like("description", searchText));
         }
         queryWrapper.like(StringUtils.isNotBlank(name), "name", name);
         queryWrapper.like(StringUtils.isNotBlank(description), "description", description);
@@ -104,16 +103,15 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         queryWrapper.ne(ObjectUtils.isNotEmpty(notId), "id", notId);
         queryWrapper.eq(ObjectUtils.isNotEmpty(id), "id", id);
         queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
-        queryWrapper.eq(StringUtils.isNotEmpty(basePackage), "basePackage", basePackage);
-        queryWrapper.eq(StringUtils.isNotEmpty(version), "version", version);
-        queryWrapper.eq(StringUtils.isNotEmpty(author), "author", author);
-        queryWrapper.eq(StringUtils.isNotEmpty(distPath), "distPath", distPath);
+        queryWrapper.eq(StringUtils.isNotBlank(basePackage), "basePackage", basePackage);
+        queryWrapper.eq(StringUtils.isNotBlank(version), "version", version);
+        queryWrapper.eq(StringUtils.isNotBlank(author), "author", author);
+        queryWrapper.eq(StringUtils.isNotBlank(distPath), "distPath", distPath);
         queryWrapper.eq(ObjectUtils.isNotEmpty(status), "status", status);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
         return queryWrapper;
     }
-
 
     @Override
     public GeneratorVO getGeneratorVO(Generator generator, HttpServletRequest request) {
@@ -141,11 +139,19 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         Set<Long> userIdSet = generatorList.stream().map(Generator::getUserId).collect(Collectors.toSet());
         Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
                 .collect(Collectors.groupingBy(User::getId));
+        // 填充信息
+        List<GeneratorVO> generatorVOList = generatorList.stream().map(generator -> {
+            GeneratorVO generatorVO = GeneratorVO.objToVo(generator);
+            Long userId = generator.getUserId();
+            User user = null;
+            if (userIdUserListMap.containsKey(userId)) {
+                user = userIdUserListMap.get(userId).get(0);
+            }
+            generatorVO.setUser(userService.getUserVO(user));
+            return generatorVO;
+        }).collect(Collectors.toList());
+        generatorVOPage.setRecords(generatorVOList);
         return generatorVOPage;
     }
 
 }
-
-
-
-

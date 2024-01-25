@@ -10,7 +10,7 @@ import com.jxy.generator.model.vo.GeneratorVO;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * 帖子服务
+ * 代码生成器服务
  *
  * @author 江喜原
  */

@@ -19,7 +19,7 @@ declare namespace API {
 
   type BaseResponseLong_ = {
     code?: number;
-    data?: number;
+    data?: string;
     message?: string;
   };
 
@@ -66,12 +66,16 @@ declare namespace API {
   };
 
   type DeleteRequest = {
-    id?: number;
+    id?: string;
+  };
+
+  type downloadGeneratorByIdUsingGETParams = {
+    /** id */
+    id?: string;
   };
 
   type FileConfig = {
     files?: FileInfo[];
-    gitRootPath?: string;
     inputRootPath?: string;
     outputRootPath?: string;
     sourceRootPath?: string;
@@ -96,7 +100,7 @@ declare namespace API {
     description?: string;
     distPath?: string;
     fileConfig?: string;
-    id?: number;
+    id?: string;
     isDelete?: number;
     modelConfig?: string;
     name?: string;
@@ -104,7 +108,7 @@ declare namespace API {
     status?: number;
     tags?: string;
     updateTime?: string;
-    userId?: number;
+    userId?: string;
     version?: string;
   };
 
@@ -122,18 +126,27 @@ declare namespace API {
     version?: string;
   };
 
+  type GeneratorCacheRequest = {
+    id?: string;
+  };
+
   type GeneratorEditRequest = {
     author?: string;
     basePackage?: string;
     description?: string;
     distPath?: string;
     fileConfig?: FileConfig;
-    id?: number;
+    id?: string;
     modelConfig?: ModelConfig;
     name?: string;
     picture?: string;
     tags?: string[];
     version?: string;
+  };
+
+  type GeneratorMakeRequest = {
+    meta?: Meta;
+    zipFilePath?: string;
   };
 
   type GeneratorQueryRequest = {
@@ -142,9 +155,9 @@ declare namespace API {
     current?: number;
     description?: string;
     distPath?: string;
-    id?: number;
+    id?: string;
     name?: string;
-    notId?: number;
+    notId?: string;
     orTags?: string[];
     pageSize?: number;
     searchText?: string;
@@ -152,7 +165,7 @@ declare namespace API {
     sortOrder?: string;
     status?: number;
     tags?: string[];
-    userId?: number;
+    userId?: string;
     version?: string;
   };
 
@@ -162,13 +175,18 @@ declare namespace API {
     description?: string;
     distPath?: string;
     fileConfig?: FileConfig;
-    id?: number;
+    id?: string;
     modelConfig?: ModelConfig;
     name?: string;
     picture?: string;
     status?: number;
     tags?: string[];
     version?: string;
+  };
+
+  type GeneratorUseRequest = {
+    dataModel?: Record<string, any>;
+    id?: string;
   };
 
   type GeneratorVO = {
@@ -178,7 +196,7 @@ declare namespace API {
     description?: string;
     distPath?: string;
     fileConfig?: FileConfig;
-    id?: number;
+    id?: string;
     modelConfig?: ModelConfig;
     name?: string;
     picture?: string;
@@ -186,33 +204,44 @@ declare namespace API {
     tags?: string[];
     updateTime?: string;
     user?: UserVO;
-    userId?: number;
+    userId?: string;
     version?: string;
   };
 
   type getGeneratorVOByIdUsingGETParams = {
     /** id */
-    id?: number;
+    id?: string;
   };
 
   type getUserByIdUsingGETParams = {
     /** id */
-    id?: number;
+    id?: string;
   };
 
   type getUserVOByIdUsingGETParams = {
     /** id */
-    id?: number;
+    id?: string;
   };
 
   type LoginUserVO = {
     createTime?: string;
-    id?: number;
+    id?: string;
     updateTime?: string;
     userAvatar?: string;
     userName?: string;
     userProfile?: string;
     userRole?: string;
+  };
+
+  type Meta = {
+    author?: string;
+    basePackage?: string;
+    createTime?: string;
+    description?: string;
+    fileConfig?: FileConfig;
+    modelConfig?: ModelConfig;
+    name?: string;
+    version?: string;
   };
 
   type ModelConfig = {
@@ -239,54 +268,59 @@ declare namespace API {
 
   type PageGenerator_ = {
     countId?: string;
-    current?: number;
-    maxLimit?: number;
+    current?: string;
+    maxLimit?: string;
     optimizeCountSql?: boolean;
     orders?: OrderItem[];
-    pages?: number;
+    pages?: string;
     records?: Generator[];
     searchCount?: boolean;
-    size?: number;
-    total?: number;
+    size?: string;
+    total?: string;
   };
 
   type PageGeneratorVO_ = {
     countId?: string;
-    current?: number;
-    maxLimit?: number;
+    current?: string;
+    maxLimit?: string;
     optimizeCountSql?: boolean;
     orders?: OrderItem[];
-    pages?: number;
+    pages?: string;
     records?: GeneratorVO[];
     searchCount?: boolean;
-    size?: number;
-    total?: number;
+    size?: string;
+    total?: string;
   };
 
   type PageUser_ = {
     countId?: string;
-    current?: number;
-    maxLimit?: number;
+    current?: string;
+    maxLimit?: string;
     optimizeCountSql?: boolean;
     orders?: OrderItem[];
-    pages?: number;
+    pages?: string;
     records?: User[];
     searchCount?: boolean;
-    size?: number;
-    total?: number;
+    size?: string;
+    total?: string;
   };
 
   type PageUserVO_ = {
     countId?: string;
-    current?: number;
-    maxLimit?: number;
+    current?: string;
+    maxLimit?: string;
     optimizeCountSql?: boolean;
     orders?: OrderItem[];
-    pages?: number;
+    pages?: string;
     records?: UserVO[];
     searchCount?: boolean;
-    size?: number;
-    total?: number;
+    size?: string;
+    total?: string;
+  };
+
+  type testDownloadFileUsingGETParams = {
+    /** filepath */
+    filepath?: string;
   };
 
   type uploadFileUsingPOSTParams = {
@@ -295,7 +329,7 @@ declare namespace API {
 
   type User = {
     createTime?: string;
-    id?: number;
+    id?: string;
     isDelete?: number;
     updateTime?: string;
     userAccount?: string;
@@ -320,7 +354,7 @@ declare namespace API {
 
   type UserQueryRequest = {
     current?: number;
-    id?: number;
+    id?: string;
     pageSize?: number;
     sortField?: string;
     sortOrder?: string;
@@ -342,7 +376,7 @@ declare namespace API {
   };
 
   type UserUpdateRequest = {
-    id?: number;
+    id?: string;
     userAvatar?: string;
     userName?: string;
     userProfile?: string;
@@ -351,7 +385,7 @@ declare namespace API {
 
   type UserVO = {
     createTime?: string;
-    id?: number;
+    id?: string;
     userAvatar?: string;
     userName?: string;
     userProfile?: string;

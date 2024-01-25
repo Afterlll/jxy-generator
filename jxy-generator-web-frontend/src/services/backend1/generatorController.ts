@@ -17,6 +17,21 @@ export async function addGeneratorUsingPost(
   });
 }
 
+/** cacheGenerator POST /api/generator/cache */
+export async function cacheGeneratorUsingPost(
+  body: API.GeneratorCacheRequest,
+  options?: { [key: string]: any },
+) {
+  return request<any>('/api/generator/cache', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** deleteGenerator POST /api/generator/delete */
 export async function deleteGeneratorUsingPost(
   body: API.DeleteRequest,
@@ -28,6 +43,21 @@ export async function deleteGeneratorUsingPost(
       'Content-Type': 'application/json',
     },
     data: body,
+    ...(options || {}),
+  });
+}
+
+/** downloadGeneratorById GET /api/generator/download */
+export async function downloadGeneratorByIdUsingGet(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.downloadGeneratorByIdUsingGETParams,
+  options?: { [key: string]: any },
+) {
+  return request<any>('/api/generator/download', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
     ...(options || {}),
   });
 }
@@ -92,6 +122,36 @@ export async function listGeneratorVoByPageUsingPost(
   });
 }
 
+/** listGeneratorVOByPageFast POST /api/generator/list/page/vo/fast */
+export async function listGeneratorVoByPageFastUsingPost(
+  body: API.GeneratorQueryRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponsePageGeneratorVO_>('/api/generator/list/page/vo/fast', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** makeGenerator POST /api/generator/make */
+export async function makeGeneratorUsingPost(
+  body: API.GeneratorMakeRequest,
+  options?: { [key: string]: any },
+) {
+  return request<any>('/api/generator/make', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** listMyGeneratorVOByPage POST /api/generator/my/list/page/vo */
 export async function listMyGeneratorVoByPageUsingPost(
   body: API.GeneratorQueryRequest,
@@ -113,6 +173,21 @@ export async function updateGeneratorUsingPost(
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponseBoolean_>('/api/generator/update', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** useGenerator POST /api/generator/use */
+export async function useGeneratorUsingPost(
+  body: API.GeneratorUseRequest,
+  options?: { [key: string]: any },
+) {
+  return request<any>('/api/generator/use', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
