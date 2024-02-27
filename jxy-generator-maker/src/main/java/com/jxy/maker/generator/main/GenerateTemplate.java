@@ -3,6 +3,7 @@ package com.jxy.maker.generator.main;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 import com.jxy.maker.generator.GitGenerator;
 import com.jxy.maker.generator.JarGenerator;
 import com.jxy.maker.generator.ScriptGenerator;
@@ -102,6 +103,7 @@ public abstract class GenerateTemplate {
 
     /**
      * 构建jar包
+     *
      * @param meta
      * @param outputPath
      * @return
@@ -113,6 +115,18 @@ public abstract class GenerateTemplate {
         JarGenerator.doGenerate(outputPath);
         String jarName = String.format("%s-%s-jar-with-dependencies.jar", meta.getName(), meta.getVersion());
         return "target/" + jarName;
+    }
+
+    /**
+     * 构建 zip
+     *
+     * @param outputPath
+     * @return 压缩包路径
+     */
+    protected String buildZip(String outputPath) {
+        String zipPath = outputPath + ".zip";
+        ZipUtil.zip(outputPath, zipPath);
+        return zipPath;
     }
 
     /**
