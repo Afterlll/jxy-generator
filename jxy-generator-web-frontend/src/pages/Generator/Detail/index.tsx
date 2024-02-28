@@ -133,7 +133,7 @@ const GeneratorDetailPage: React.FC = () => {
       <Card>
         <Tabs
           size="large"
-          defaultActiveKey={'newest'}
+          defaultActiveKey={'fileConfig'}
           onChange={() => {}}
           items={[
             {
