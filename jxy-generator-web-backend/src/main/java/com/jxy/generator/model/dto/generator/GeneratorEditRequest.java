@@ -1,6 +1,6 @@
 package com.jxy.generator.model.dto.generator;
 
-import com.jxy.generator.meta.Meta;
+import com.jxy.maker.meta.Meta;
 import lombok.Data;
 
 import java.io.Serializable;

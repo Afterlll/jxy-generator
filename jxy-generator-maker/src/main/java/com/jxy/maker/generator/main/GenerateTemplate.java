@@ -22,13 +22,19 @@ public abstract class GenerateTemplate {
 
     public void doGenerate() throws TemplateException, IOException, InterruptedException {
         Meta meta = MetaManage.getMetaObject();
-
-        // 0. 输出根路径
-        // 项目的根路径
         String projectPath = System.getProperty("user.dir");
-        // 指定模型数据文件的输出目录
         String outputPath = projectPath + File.separator + "generated" + File.separator + meta.getName();
-        // 创建输出目录
+        doGenerate(meta, outputPath);
+    }
+
+    /**
+     * 生成
+     *
+     * @throws TemplateException
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void doGenerate(Meta meta, String outputPath) throws TemplateException, IOException, InterruptedException {
         if (!FileUtil.exist(outputPath)) {
             FileUtil.mkdir(outputPath);
         }
@@ -44,7 +50,7 @@ public abstract class GenerateTemplate {
         // 5. 生成精简版的程序（产物包）
         String distOutputPath = buildDist(outputPath, sourceCopyDestPath, jarPath, shellOutputFilePath);
         // 6. 增加 git 托管
-        addGit(meta, outputPath, distOutputPath);
+//        addGit(meta, outputPath, distOutputPath);
     }
 
     protected void addGit(Meta meta, String outputPath, String distOutputPath) throws IOException {
@@ -137,8 +143,9 @@ public abstract class GenerateTemplate {
      * @throws TemplateException
      */
     protected void generateCode(Meta meta, String outputPath) throws IOException, TemplateException {
-        // resource 目录的 路径
-        String inputResourcePath = new ClassPathResource("").getAbsolutePath();
+        // 读取 resources 目录
+        String inputResourcePath = "";
+
         // 生成java文件的目录
         String outputBaseJavaPackagePath = outputPath + File.separator + "src/main/java/" + StrUtil.join("/", StrUtil.split(meta.getBasePackage(), "."));
 

@@ -1,7 +1,7 @@
 package com.jxy.generator.model.vo;
 
 import cn.hutool.json.JSONUtil;
-import com.jxy.generator.meta.Meta;
+import com.jxy.maker.meta.Meta;
 import com.jxy.generator.model.entity.Generator;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
