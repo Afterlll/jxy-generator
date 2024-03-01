@@ -50,7 +50,7 @@ public abstract class GenerateTemplate {
         // 5. 生成精简版的程序（产物包）
         String distOutputPath = buildDist(outputPath, sourceCopyDestPath, jarPath, shellOutputFilePath);
         // 6. 增加 git 托管
-//        addGit(meta, outputPath, distOutputPath);
+        addGit(meta, outputPath, distOutputPath);
     }
 
     protected void addGit(Meta meta, String outputPath, String distOutputPath) throws IOException {

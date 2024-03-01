@@ -20,7 +20,7 @@ public class DynamicGenerator {
      */
     public static void deGenerator(String inputPath, String outputPath, Object model) throws IOException, TemplateException {
         // 创建配置对象
-        Configuration configuration = new Configuration(Configuration.VERSION_2_3_31);
+        Configuration configuration = new Configuration(Configuration.VERSION_2_3_32);
         configuration.setDirectoryForTemplateLoading(new File(inputPath).getParentFile());
         configuration.setDefaultEncoding("utf-8");
 

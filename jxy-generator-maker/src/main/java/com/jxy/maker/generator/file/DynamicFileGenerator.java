@@ -23,7 +23,7 @@ public class DynamicFileGenerator {
      */
     public static void deGenerator(String relativeInputPath, String outputPath, Object model) throws IOException, TemplateException {
         // 创建配置对象
-        Configuration configuration = new Configuration(Configuration.VERSION_2_3_31);
+        Configuration configuration = new Configuration(Configuration.VERSION_2_3_32);
 
         // 获取模板文件所属包和模板名称
         int lastSplitIndex = relativeInputPath.lastIndexOf("/");
@@ -61,7 +61,7 @@ public class DynamicFileGenerator {
      */
     public static void doGenerateByPath(String inputPath, String outputPath, Object model) throws IOException, TemplateException {
         // 创建配置对象
-        Configuration configuration = new Configuration(Configuration.VERSION_2_3_31);
+        Configuration configuration = new Configuration(Configuration.VERSION_2_3_32);
         configuration.setDirectoryForTemplateLoading(new File(inputPath).getParentFile());
         configuration.setDefaultEncoding("utf-8");
 
