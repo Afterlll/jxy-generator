@@ -1,11 +1,14 @@
 package com.jxy.generator.controller;
 
+import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jxy.generator.annotation.AuthCheck;
 import com.jxy.generator.common.BaseResponse;
@@ -15,6 +18,7 @@ import com.jxy.generator.common.ResultUtils;
 import com.jxy.generator.constant.UserConstant;
 import com.jxy.generator.exception.BusinessException;
 import com.jxy.generator.exception.ThrowUtils;
+import com.jxy.generator.manager.CacheManager;
 import com.jxy.generator.manager.CosManager;
 import com.jxy.maker.generator.main.GenerateTemplate;
 import com.jxy.maker.generator.main.ZipGenerator;
@@ -31,6 +35,7 @@ import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -45,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 代码生成器接口
@@ -64,6 +70,9 @@ public class GeneratorController {
 
     @Resource
     private CosManager cosManager;
+
+    @Resource
+    private CacheManager cacheManager;
 
     // region 增删改查
 
@@ -207,6 +216,47 @@ public class GeneratorController {
     }
 
     /**
+     * 快速分页获取列表（封装类）
+     *
+     * @param generatorQueryRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/list/page/vo/fast")
+    public BaseResponse<Page<GeneratorVO>> listGeneratorVOByPageFast(@RequestBody GeneratorQueryRequest generatorQueryRequest,
+                                                                 HttpServletRequest request) {
+        long current = generatorQueryRequest.getCurrent();
+        long size = generatorQueryRequest.getPageSize();
+        
+        // 优先从缓存中获取（多级缓存）
+        String cacheKey = getPageCacheKey(generatorQueryRequest);
+        Object cacheValue = cacheManager.get(cacheKey);
+        if (cacheValue != null) {
+            // 缓存命中
+            return ResultUtils.success((Page<GeneratorVO>) cacheValue);
+        }
+
+        // 限制爬虫
+        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+
+        // 优化 SQL
+        QueryWrapper<Generator> queryWrapper = generatorService.getQueryWrapper(generatorQueryRequest);
+        queryWrapper.select("id","name","description","basePackage","version","author","tags","picture","status","userId","createTime","updateTime");
+        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size),
+                queryWrapper);
+        // 精简字段
+        generatorPage.getRecords().forEach(generator -> {
+            generator.setFileConfig(null);
+            generator.setModelConfig(null);
+        });
+
+        // 写入多级缓存
+        cacheManager.put(cacheKey, generatorPage);
+
+        return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage, request));
+    }
+
+    /**
      * 分页获取当前用户创建的资源列表
      *
      * @param generatorQueryRequest
@@ -292,6 +342,18 @@ public class GeneratorController {
         // 追踪事件
         log.info("用户 {} 下载了 {}", loginUser, filepath);
 
+        // 优先从缓存中获取安装包
+        String zipFilePath = getCacheFilePath(id, filepath);
+        if (FileUtil.exist(zipFilePath)) {
+            // 设置响应头
+            response.setContentType("application/octet-stream;charset=UTF-8");
+            response.setHeader("Content-Disposition", "attachment; filename=" + filepath);
+            // 写入响应流
+            Files.copy(Paths.get(zipFilePath), response.getOutputStream());
+            return;
+        }
+
+        // 缓存中不存在安装包，从对象存储中下载
         COSObjectInputStream cosObjectInput = null;
         try {
             COSObject cosObject = cosManager.getObject(filepath);
@@ -500,6 +562,67 @@ public class GeneratorController {
         CompletableFuture.runAsync(() -> {
             FileUtil.del(tempDirPath);
         });
+    }
+
+    /**
+     * 缓存代码生成器
+     *
+     * @param generatorCacheRequest
+     * @return
+     */
+    @PostMapping("/cache")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public void cacheGenerator(@RequestBody GeneratorCacheRequest generatorCacheRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (generatorCacheRequest == null || generatorCacheRequest.getId() == null || generatorCacheRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        // 获取生成器
+        Long id = generatorCacheRequest.getId();
+        Generator generator = generatorService.getById(id);
+        if (generator == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+
+        String distpath = generator.getDistPath();
+        if (StrUtil.isBlank(distpath)) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
+        }
+
+        String zipFilePath = getCacheFilePath(id, distpath);
+
+        // 新建文件
+        if (!FileUtil.exist(zipFilePath)) {
+            FileUtil.touch(zipFilePath);
+        }
+
+        // 下载生成器
+        try {
+            cosManager.download(distpath, zipFilePath);
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "压缩包下载失败");
+        }
+    }
+
+    /**
+     * 获取缓存路径（缓存key的设计）
+     * .temp/cache/11/generator_dist/1748696431144792066/4klwqKXq-acm-template-pro-generator.zip
+     * .temp/cache/id/distPath
+     * @param id 生成器的id
+     * @param distPath 产物包的路径
+     * @return
+     */
+    public String getCacheFilePath(long id, String distPath) {
+        String projectPath = System.getProperty("user.dir");
+        String tempDirPath = String.format("%s/.temp/cache/%s", projectPath, id);
+        return String.format("%s%s", tempDirPath, distPath);
+    }
+
+    public static String getPageCacheKey(GeneratorQueryRequest generatorQueryRequest) {
+        String jsonStr = JSONUtil.toJsonStr(generatorQueryRequest);
+        String base64 = Base64Encoder.encode(jsonStr);
+        String key = "generator:page:" + base64;
+        return key;
     }
 
 }

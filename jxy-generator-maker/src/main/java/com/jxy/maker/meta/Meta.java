@@ -3,11 +3,12 @@ package com.jxy.maker.meta;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @NoArgsConstructor
 @Data
-public class Meta {
+public class Meta implements Serializable {
 
     public String name;
     public String description;
@@ -20,7 +21,7 @@ public class Meta {
 
     @NoArgsConstructor
     @Data
-    public static class FileConfig {
+    public static class FileConfig implements Serializable {
         public String inputRootPath;
         public String outputRootPath;
         public String sourceRootPath;
@@ -30,7 +31,7 @@ public class Meta {
 
         @NoArgsConstructor
         @Data
-        public static class FileInfo {
+        public static class FileInfo implements Serializable {
             public String inputPath;
             public String outputPath;
             public String type;
@@ -44,7 +45,7 @@ public class Meta {
 
     @NoArgsConstructor
     @Data
-    public static class ModelConfig {
+    public static class ModelConfig implements Serializable {
         public List<ModelInfo> models;
 
         @NoArgsConstructor

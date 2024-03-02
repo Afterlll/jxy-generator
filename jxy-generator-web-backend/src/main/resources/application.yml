@@ -24,13 +24,11 @@ spring:
     username: root
     password: 123
   # Redis 配置
-  # todo 需替换配置，然后取消注释
-  #  redis:
-  #    database: 1
-  #    host: localhost
-  #    port: 6379
-  #    timeout: 5000
-  #    password: 123456
+  redis:
+    database: 1
+    host: localhost
+    port: 6379
+    timeout: 5000
   # 文件上传
   servlet:
     multipart:
@@ -45,6 +43,14 @@ server:
     session:
       cookie:
         max-age: 2592000
+  tomcat:
+    # 服务器在任何给定时间接受和处理的最大连接数。一旦达到限制，操作系统仍然可以接受基于“acceptCount”属性的连接。
+    max-connections: 10000
+    threads:
+      # 工作线程的最大数量 io密集型建议10倍的cpu数，cpu密集型建议cpu数+1，绝大部分应用都是io密集型
+      max: 5000
+    # 当所有可能的请求处理线程都在使用中时，传入连接请求的最大队列长度
+    accept-count: 1000
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
