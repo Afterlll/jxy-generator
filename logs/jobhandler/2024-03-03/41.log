@@ -1,0 +1,19 @@
+2024-03-03 17:45:00 [com.xxl.job.core.thread.JobThread#run]-[133]-[xxl-job, JobThread-3-1709459040071] <br>----------- xxl-job job execute start -----------<br>----------- Param:
+2024-03-03 17:45:00 [com.xxl.job.core.thread.JobThread#run]-[204]-[xxl-job, JobThread-3-1709459040071] <br>----------- JobThread Exception:java.lang.reflect.InvocationTargetException
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at com.xxl.job.core.handler.impl.MethodJobHandler.execute(MethodJobHandler.java:31)
+	at com.xxl.job.core.thread.JobThread.run(JobThread.java:166)
+Caused by: com.qcloud.cos.exception.CosServiceException: Invalid Argument (Status Code: 400; Error Code: InvalidArgument; Request ID: NjVlNDQ2OWNfODkxMzc2MGJfYzQ1MV9hNGZjMjRm); Trace ID: OGVmYzZiMmQzYjA2OWNhODk0NTRkMTBiOWVmMDAxODc0OWRkZjk0ZDM1NmI1M2E2MTRlY2MzZDhmNmI5MWI1OWRlZDk5YzgyOTg0ZTg2ODA1ODFjOGY0MWFhYWFhOTdmZjNmZThkZjUzMmU0ZGUyNTU2ODNiZmJiMzUyYzRiYTI=
+	at com.qcloud.cos.http.DefaultCosHttpClient.handlerErrorMessage(DefaultCosHttpClient.java:339)
+	at com.qcloud.cos.http.DefaultCosHttpClient.checkResponse(DefaultCosHttpClient.java:377)
+	at com.qcloud.cos.http.DefaultCosHttpClient.exeute(DefaultCosHttpClient.java:476)
+	at com.qcloud.cos.COSClient.invoke(COSClient.java:582)
+	at com.qcloud.cos.COSClient.deleteObjects(COSClient.java:1283)
+	at com.jxy.generator.manager.CosManager.deleteObjects(CosManager.java:135)
+	at com.jxy.generator.job.ClearCosJobHandler.clearCosJobHandler(ClearCosJobHandler.java:49)
+	... 6 more
+<br>----------- xxl-job job execute end(error) -----------
+2024-03-03 17:45:00 [com.xxl.job.core.thread.TriggerCallbackThread#callbackLog]-[197]-[xxl-job, executor TriggerCallbackThread] <br>----------- xxl-job job callback finish.

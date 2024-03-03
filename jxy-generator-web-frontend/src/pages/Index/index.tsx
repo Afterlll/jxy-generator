@@ -60,6 +60,8 @@ const IndexPage: React.FC = () => {
       return <></>;
     }
 
+    tags = JSON.parse(tags)
+
     return (
       <div style={{ marginBottom: 8 }}>
         {tags.map((tag) => (

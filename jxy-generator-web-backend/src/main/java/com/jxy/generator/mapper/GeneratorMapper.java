@@ -2,6 +2,9 @@ package com.jxy.generator.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jxy.generator.model.entity.Generator;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * @author 13547
@@ -10,7 +13,12 @@ import com.jxy.generator.model.entity.Generator;
  * @Entity generator.domain.Generator
  */
 public interface GeneratorMapper extends BaseMapper<Generator> {
-
+    /**
+     *返回所有已删除的生成器
+     * @return
+     */
+    @Select("SELECT id, distPath FROM generator where isDelete = 1;")
+    List<Generator> listDeletedGenerator();
 }
 
 
