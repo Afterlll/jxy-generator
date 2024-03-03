@@ -6,6 +6,7 @@ generated/
 /generator.bat
 .temp
 application-local.yml
+logs/
 
 ### Maven template
 target/
