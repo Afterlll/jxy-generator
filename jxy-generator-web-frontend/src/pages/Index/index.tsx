@@ -1,6 +1,5 @@
 import {
-  listGeneratorVoByPageFastUsingPost,
-  listGeneratorVoByPageUsingPost
+  listGeneratorVoByPageFastUsingPost
 } from '@/services/backend/generatorController';
 import { UserOutlined } from '@ant-design/icons';
 import { PageContainer, ProFormSelect, ProFormText, QueryFilter } from '@ant-design/pro-components';
@@ -56,11 +55,9 @@ const IndexPage: React.FC = () => {
    * @param tags
    */
   const tagListView = (tags?: string[]) => {
-    if (!tags) {
+    if (!tags || !Array.isArray(tags)) {
       return <></>;
     }
-
-    tags = JSON.parse(tags)
 
     return (
       <div style={{ marginBottom: 8 }}>

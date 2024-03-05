@@ -1,6 +1,5 @@
 package com.jxy.maker;
 
-import com.jxy.maker.generator.main.MainGenerator;
 import com.jxy.maker.generator.main.ZipGenerator;
 import freemarker.template.TemplateException;
 

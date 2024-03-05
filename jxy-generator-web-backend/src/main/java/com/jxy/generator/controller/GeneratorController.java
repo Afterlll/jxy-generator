@@ -418,7 +418,7 @@ public class GeneratorController {
 
         try {
             cosManager.download(distPath, zipFilePath);
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器下载失败");
         }
 
@@ -436,7 +436,8 @@ public class GeneratorController {
         // 要注意，如果不是 windows 系统，找 generator 文件而不是 bat
         File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null)
                 .stream()
-                .filter(file -> file.isFile() && "generator.bat".equals(file.getName()))
+                // 记得改回来
+                .filter(file -> file.isFile() && "generator".equals(file.getName()))
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
 

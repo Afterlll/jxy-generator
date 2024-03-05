@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jxy.generator.mapper.GeneratorMapper">
 
-    <resultMap id="BaseResultMap" type="generator.domain.Generator">
+    <resultMap id="BaseResultMap" type="com.jxy.generator.model.entity.Generator">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="name" column="name" jdbcType="VARCHAR"/>
         <result property="description" column="description" jdbcType="VARCHAR"/>

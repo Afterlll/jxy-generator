@@ -9,13 +9,14 @@ import java.io.*;
 public class JarGenerator {
 
     public static void doGenerate(String projectDir) throws InterruptedException, IOException {
+        // 记得改回来
         // Windows maven 命令
         String windowsMavenCommand = "mvn.cmd clean package -DskipTests=true";
         // 其他操作系统的 maven 命令
         String otherMavenCommand = "mvn clean package -DskipTests=true";
 
         // 使用windows 命令测试
-        String mavenCommand = windowsMavenCommand;
+        String mavenCommand = otherMavenCommand;
 
         // 执行 maven 命令 注意 ： 命令需要使用空格分割开，否则就会被识别为一个字符串
         ProcessBuilder processBuilder = new ProcessBuilder(mavenCommand.split(" "));

@@ -11,7 +11,7 @@ import java.util.Map;
  * @author 江喜原
  */
 @Data
-public class GeneratorUseRequest implements Serializable {
+public class  GeneratorUseRequest implements Serializable {
 
     /**
      * 生成器的id
